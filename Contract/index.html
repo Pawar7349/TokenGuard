@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokenGuard - Complete Token Recovery Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .tagline {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        
+        /* WALLET BAR */
+        .wallet-bar {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .wallet-info {
+            flex: 1;
+        }
+        
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            color: #22d3ee;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .wallet-balances {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .balance-item {
+            background: #0f172a;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        
+        .balance-label {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        
+        .balance-value {
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .connect-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .connect-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .tab-btn {
+            background: #1e293b;
+            color: #94a3b8;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .tab-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* CARDS */
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+        }
+        
+        .card-desc {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        /* GRID LAYOUT */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        /* FORMS */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            background: #0f172a;
+            border: 2px solid #334155;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        /* BUTTONS */
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        .btn-success {
+            background: #059669;
+        }
+        
+        .btn-success:hover {
+            background: #047857;
+        }
+        
+        .btn-danger {
+            background: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        
+        .btn-warning {
+            background: #d97706;
+        }
+        
+        .btn-warning:hover {
+            background: #b45309;
+        }
+        
+        /* QUICK ACTIONS */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            background: #334155;
+            color: #cbd5e1;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .quick-btn:hover {
+            background: #475569;
+        }
+        
+        /* ALERTS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: #064e3b;
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+        }
+        
+        .alert-error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+        
+        .alert-info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+            color: #93c5fd;
+        }
+        
+        .alert-warning {
+            background: #78350f;
+            border: 1px solid #f59e0b;
+            color: #fcd34d;
+        }
+        
+        /* STATUS BOX */
+        .status-box {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .status-box.show {
+            display: block;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .status-row:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            color: #94a3b8;
+        }
+        
+        .status-value {
+            color: #f1f5f9;
+            font-weight: 600;
+            text-align: right;
+            word-break: break-all;
+            max-width: 60%;
+        }
+        
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #065f46;
+            color: #6ee7b7;
+        }
+        
+        .badge-pending {
+            background: #78350f;
+            color: #fcd34d;
+        }
+        
+        .badge-disputed {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        .badge-info {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+        
+        /* INFO CARDS */
+        .info-card {
+            background: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .info-card-title {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .info-card-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        /* NETWORK WARNING */
+        .network-warning {
+            background: #78350f;
+            border: 2px solid #f59e0b;
+            color: #fcd34d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .network-warning.show {
+            display: block;
+        }
+        
+        /* TOKEN ACTIONS */
+        .token-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .token-action {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .token-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .token-action-title {
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        /* ALLOWANCE DISPLAY */
+        .allowance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #0f172a;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .allowance-info {
+            flex: 1;
+        }
+        
+        .allowance-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .allowance-value {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+        
+        /* FOOTER */
+        footer {
+            text-align: center;
+            color: #64748b;
+            margin-top: 40px;
+            padding: 20px;
+        }
+        
+        /* LOADING */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .wallet-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .wallet-balances {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .token-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-btn {
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🛡️</div>
+            <h1>TokenGuard</h1>
+            <p class="tagline">Complete Token Management & Recovery Platform</p>
+        </header>
+
+        <!-- WALLET BAR -->
+        <div class="wallet-bar">
+            <div class="wallet-info" id="walletInfo" style="display: none;">
+                <div class="wallet-address" id="walletAddress"></div>
+                <div class="wallet-balances" id="walletBalances">
+                    <!-- Balances will be inserted here -->
+                </div>
+            </div>
+            <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
+                Connect Wallet
+            </button>
+        </div>
+
+        <!-- NETWORK WARNING -->
+        <div id="networkWarning" class="network-warning">
+            ⚠️ Wrong network! Please switch to Sepolia Testnet
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div id="mainContent" style="display: none;">
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+                <button class="tab-btn" onclick="switchTab('report')">📝 Report Lost</button>
+                <button class="tab-btn" onclick="switchTab('return')">💰 Return & Earn</button>
+                <button class="tab-btn" onclick="switchTab('check')">🔍 Check Status</button>
+                <button class="tab-btn" onclick="switchTab('dispute')">⚖️ File Dispute</button>
+                <button class="tab-btn" onclick="switchTab('token')">🪙 Mock Token</button>
+                <button class="tab-btn" onclick="switchTab('admin')">👑 Admin</button>
+            </div>
+
+            <!-- DASHBOARD TAB -->
+            <div id="dashboardTab" class="tab-content active">
+                <div class="dashboard-grid">
+                    <!-- Token Stats -->
+                    <div class="card">
+                        <h2 class="card-title">Token Statistics</h2>
+                        <div class="status-box show" style="margin-top: 15px;">
+                            <div class="status-row">
+                                <span class="status-label">MOCK Balance</span>
+                                <span class="status-value" id="dashboardMockBalance">0 MOCK</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">ETH Balance</span>
+                                <span class="status-value" id="dashboardEthBalance">0 ETH</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">MOCK Total Supply</span>
+                                <span class="status-value" id="dashboardTotalSupply">0 MOCK</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Allowance to TokenGuard</span>
+                                <span class="status-value" id="dashboardAllowance">0 MOCK</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contract Info -->
+                    <div class="card">
+                        <h2 class="card-title">Contract Information</h2>
+                        <div class="status-box show" style="margin-top: 15px;">
+                            <div class="status-row">
+                                <span class="status-label">TokenGuard Address</span>
+                                <span class="status-value" id="dashboardTokenGuardAddr">-</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Mock Token Address</span>
+                                <span class="status-value" id="dashboardMockAddr">-</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Current Reward %</span>
+                                <span class="status-value" id="dashboardRewardPercent">5%</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Contract Owner</span>
+                                <span class="status-value" id="dashboardOwner">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <h2 class="card-title">Quick Actions</h2>
+                        <div class="quick-actions" style="margin-top: 20px;">
+                            <button class="quick-btn" onclick="generateHash()">🎲 Random Hash</button>
+                            <button class="quick-btn" onclick="useMockToken()">🪙 Use MOCK</button>
+                            <button class="quick-btn" onclick="refreshAllBalances()">🔄 Refresh</button>
+                            <button class="quick-btn" onclick="mintMockTokens(100)">➕ Mint 100</button>
+                        </div>
+                        
+                        <div class="token-actions">
+                            <div class="token-action">
+                                <div class="token-icon">💸</div>
+                                <div class="token-action-title">Transfer MOCK</div>
+                                <input type="text" id="quickTransferTo" placeholder="0x..." style="margin-bottom: 10px;">
+                                <input type="number" id="quickTransferAmount" placeholder="Amount" style="margin-bottom: 10px;">
+                                <button class="btn btn-secondary" onclick="transferMockTokensQuick()">Transfer</button>
+                            </div>
+                            
+                            <div class="token-action">
+                                <div class="token-icon">✅</div>
+                                <div class="token-action-title">Approve MOCK</div>
+                                <input type="number" id="quickApproveAmount" placeholder="Amount" style="margin-bottom: 10px;">
+                                <button class="btn btn-success" onclick="approveMockTokensQuick()">Approve TokenGuard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORT LOST TAB -->
+            <div id="reportTab" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">Report Lost Tokens</h2>
+                    <p class="card-desc">
+                        Accidentally sent tokens to the wrong address? Report it here. Someone can return them and earn a reward.
+                    </p>
+
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="generateHash()">🎲 Random Hash</button>
+                        <button class="quick-btn" onclick="useMockToken()">🪙 Use MOCK Token</button>
+                        <button class="quick-btn" onclick="copyMyAddress()">📋 Copy My Address</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transaction Hash</label>
+                        <input type="text" id="reportTxHash" placeholder="0x123abc...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Token Address</label>
+                        <input type="text" id="reportToken" placeholder="0xA0C7...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount Lost</label>
+                        <input type="number" id="reportAmount" placeholder="100" step="0.01">
+                    </div>
+
+                    <button class="btn" onclick="reportLost()">Submit Report</button>
+
+                    <div id="reportAlert" class="alert"></div>
+                </div>
+            </div>
+
+            <!-- RETURN TOKENS TAB -->
+            <div id="returnTab" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">Return Tokens & Earn Reward</h2>
+                    <p class="card-desc">
+                        Help someone recover their lost tokens and automatically earn a reward!
+                    </p>
+
+                    <div class="info-card">
+                        <div class="info-card-title">Current Reward: <span id="currentRewardDisplay">5%</span></div>
+                        <div class="info-card-text">
+                            1. Enter the transaction hash from a report<br>
+                            2. Check allowance or approve tokens<br>
+                            3. Return the tokens<br>
+                            4. Get your reward instantly
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Transaction Hash</label>
+                        <input type="text" id="returnTxHash" placeholder="0x123abc...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Check Allowance Status</label>
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="checkAllowance()">Check Allowance</button>
+                            <button class="quick-btn" onclick="approveMax()">Approve Max</button>
+                        </div>
+                        <div id="allowanceStatus" class="status-box" style="margin-top: 10px; display: none;">
+                            <div class="status-row">
+                                <span class="status-label">Current Allowance</span>
+                                <span class="status-value" id="currentAllowance">0 MOCK</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="approveTokens()" style="margin-bottom: 10px;">
+                        Approve Tokens
+                    </button>
+
+                    <button class="btn" onclick="returnTokens()">
+                        Return Tokens & Earn Reward
+                    </button>
+
+                    <div id="returnAlert" class="alert"></div>
+                </div>
+            </div>
+
+            <!-- CHECK STATUS TAB -->
+            <div id="checkTab" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">Check Report Status</h2>
+                    <p class="card-desc">
+                        Look up any transaction to see if it's been reported and its current status.
+                    </p>
+
+                    <div class="form-group">
+                        <label>Transaction Hash</label>
+                        <input type="text" id="checkTxHash" placeholder="0x123abc...">
+                    </div>
+
+                    <button class="btn" onclick="checkStatus()">Check Status</button>
+
+                    <div id="checkAlert" class="alert"></div>
+
+                    <div id="statusBox" class="status-box">
+                        <h3 style="margin-bottom: 15px; color: #f1f5f9;">Report Details</h3>
+                        <div class="status-row">
+                            <span class="status-label">Reporter</span>
+                            <span class="status-value" id="statReporter"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Token</span>
+                            <span class="status-value" id="statToken"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Amount</span>
+                            <span class="status-value" id="statAmount"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Reward</span>
+                            <span class="status-value" id="statReward"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Status</span>
+                            <span class="status-value" id="statStatus"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Returned By</span>
+                            <span class="status-value" id="statReturner"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Disputed</span>
+                            <span class="status-value" id="statDisputed"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Report Time</span>
+                            <span class="status-value" id="statReportTime"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DISPUTE TAB -->
+            <div id="disputeTab" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">File a Dispute</h2>
+                    <p class="card-desc">
+                        If someone returned the wrong tokens or amount, you can file a dispute as the reporter.
+                    </p>
+
+                    <div class="form-group">
+                        <label>Transaction Hash (your report)</label>
+                        <input type="text" id="disputeTxHash" placeholder="0x123abc...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dispute Reason</label>
+                        <textarea id="disputeReason" rows="4" placeholder="Explain why you're disputing this return..."></textarea>
+                    </div>
+
+                    <button class="btn btn-danger" onclick="fileDispute()">File Dispute</button>
+
+                    <div id="disputeAlert" class="alert"></div>
+                </div>
+            </div>
+
+            <!-- MOCK TOKEN TAB -->
+            <div id="tokenTab" class="tab-content">
+                <div class="dashboard-grid">
+                    <!-- Token Info -->
+                    <div class="card">
+                        <h2 class="card-title">Mock Token Information</h2>
+                        <div class="status-box show" style="margin-top: 15px;">
+                            <div class="status-row">
+                                <span class="status-label">Name</span>
+                                <span class="status-value">Mock Token</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Symbol</span>
+                                <span class="status-value">MOCK</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Decimals</span>
+                                <span class="status-value">18</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Total Supply</span>
+                                <span class="status-value" id="tokenTotalSupply">0</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Your Balance</span>
+                                <span class="status-value" id="tokenYourBalance">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transfer Tokens -->
+                    <div class="card">
+                        <h2 class="card-title">Transfer Tokens</h2>
+                        <div class="form-group">
+                            <label>Recipient Address</label>
+                            <input type="text" id="transferTo" placeholder="0x...">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" id="transferAmount" placeholder="100" step="0.01">
+                        </div>
+                        <button class="btn" onclick="transferMockTokens()">Transfer MOCK Tokens</button>
+                        <div id="transferAlert" class="alert"></div>
+                    </div>
+
+                    <!-- Approve Tokens -->
+                    <div class="card">
+                        <h2 class="card-title">Approve Tokens</h2>
+                        <div class="form-group">
+                            <label>Spender Address</label>
+                            <input type="text" id="approveSpender" placeholder="0x..." value="0x99a13EaE15e7af8f7D2caC542B3c8eDCBc17c044">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" id="approveAmount" placeholder="100" step="0.01">
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="checkAllowanceForSpender()">Check Allowance</button>
+                            <button class="quick-btn" onclick="setApproveMax()">Approve Max</button>
+                        </div>
+                        <button class="btn btn-success" onclick="approveMockTokens()">Approve Tokens</button>
+                        <div id="approveAlert" class="alert"></div>
+                    </div>
+
+                    <!-- Mint Tokens -->
+                    <div class="card">
+                        <h2 class="card-title">Mint New Tokens</h2>
+                        <p class="card-desc" style="margin-bottom: 20px;">
+                            Mint new MOCK tokens to any address (including yourself).
+                        </p>
+                        <div class="form-group">
+                            <label>Recipient Address</label>
+                            <input type="text" id="mintTo" placeholder="0x...">
+                        </div>
+                        <div class="form-group">
+                            <label>Amount to Mint</label>
+                            <input type="number" id="mintAmount" placeholder="100" step="0.01">
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="setMintToSelf()">Mint to Self</button>
+                            <button class="quick-btn" onclick="mint1000()">Mint 1000</button>
+                        </div>
+                        <button class="btn btn-warning" onclick="mintMockTokens()">Mint Tokens</button>
+                        <div id="mintAlert" class="alert"></div>
+                    </div>
+
+                    <!-- Allowance Management -->
+                    <div class="card">
+                        <h2 class="card-title">Allowance Management</h2>
+                        <div id="allowancesList">
+                            <!-- Allowances will be displayed here -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="refreshAllowances()" style="margin-top: 15px;">
+                            Refresh Allowances
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN TAB -->
+            <div id="adminTab" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">Admin Panel</h2>
+                    
+                    <!-- Contract Info -->
+                    <div class="info-card" style="margin-bottom: 25px;">
+                        <div class="info-card-title">Contract Information</div>
+                        <div class="status-row">
+                            <span class="status-label">Contract Owner:</span>
+                            <span class="status-value" id="contractOwner"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Current Reward %:</span>
+                            <span class="status-value" id="currentRewardPercent">5%</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">TokenGuard Address:</span>
+                            <span class="status-value" id="contractAddress"></span>
+                        </div>
+                    </div>
+
+                    <!-- Admin Controls (Only for Owner) -->
+                    <div id="adminControls" style="display: none;">
+                        <h3 style="margin-bottom: 15px; color: #f1f5f9;">Owner Controls</h3>
+                        
+                        <div class="form-group">
+                            <label>Set New Reward Percentage (1-20%)</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="range" id="rewardSlider" min="1" max="20" value="5" 
+                                       style="flex: 1;" oninput="updateRewardValue(this.value)">
+                                <span id="rewardValue" style="min-width: 40px; text-align: center;">5%</span>
+                            </div>
+                            <input type="number" id="newRewardPercent" placeholder="5" min="1" max="20" 
+                                   style="margin-top: 10px;" value="5">
+                        </div>
+
+                        <button class="btn btn-secondary" onclick="updateRewardPercent()">
+                            Update Reward Percentage
+                        </button>
+
+                        <!-- Event Logs -->
+                        <div style="margin-top: 30px;">
+                            <h4 style="margin-bottom: 15px; color: #f1f5f9;">Live Events</h4>
+                            <div id="eventLog" style="max-height: 300px; overflow-y: auto; padding: 10px; background: #0f172a; border-radius: 6px; border: 1px solid #334155;">
+                                <div style="color: #94a3b8; text-align: center; padding: 20px;">
+                                    Waiting for events...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Non-Owner Message -->
+                    <div id="notOwnerMessage" class="info-card" style="display: none;">
+                        <div class="info-card-title">Not an Admin</div>
+                        <div class="info-card-text">
+                            You are not the contract owner. Admin controls are only available to the contract deployer.
+                        </div>
+                    </div>
+
+                    <div id="adminAlert" class="alert"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Deployed on Sepolia Testnet • TokenGuard v1.0 • Mock Token v1.0</p>
+            <p style="margin-top: 5px; font-size: 0.9rem;">Built by Pratik Pawar • Complete Frontend Coverage</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============ CONTRACT ADDRESSES & CONFIG ============
+        const TOKENGUARD_ADDRESS = '0x99a13EaE15e7af8f7D2caC542B3c8eDCBc17c044';
+        const MOCK_TOKEN_ADDRESS = '0xA0C7D36c9645AdBDd7C76588b48BaA71892dDeeC';
+        const SEPOLIA_CHAIN_ID = 11155111;
+
+        // ============ ABIs ============
+        const TOKENGUARD_ABI = [
+            // Main Functions
+            "function reportLost(string txHash, address token, uint256 amount)",
+            "function returnTokens(string txHash)",
+            "function checkStatus(string txHash) view returns (address reporter, address token, uint256 amount, uint256 reward, bool resolved, bool disputed, address returnedBy)",
+            "function fileDispute(string txHash, string reason)",
+            
+            // Admin Functions
+            "function setRewardPercent(uint256 newPercent)",
+            "function rewardPercent() view returns (uint256)",
+            "function owner() view returns (address)",
+            
+            // View Functions
+            "function lostTokens(string) view returns (address reporter, address token, uint256 amount, uint256 reward, bool resolved, bool disputed, address returnedBy, uint256 reportTime)",
+            
+            // Events
+            "event TokenReported(string txHash, address reporter, uint256 amount, uint256 reward)",
+            "event TokenReturned(string txHash, address returnedBy, uint256 reward)",
+            "event DisputeFiled(string txHash, address reporter, string reason)"
+        ];
+
+        const MOCK_TOKEN_ABI = [
+            // ERC20 Standard
+            "function name() view returns (string)",
+            "function symbol() view returns (string)",
+            "function decimals() view returns (uint8)",
+            "function totalSupply() view returns (uint256)",
+            "function balanceOf(address account) view returns (uint256)",
+            "function transfer(address to, uint256 amount) returns (bool)",
+            "function approve(address spender, uint256 amount) returns (bool)",
+            "function allowance(address owner, address spender) view returns (uint256)",
+            "function transferFrom(address from, address to, uint256 amount) returns (bool)",
+            
+            // Custom Functions
+            "function mint(address to, uint256 amount) external",
+            
+            // Events
+            "event Transfer(address indexed from, address indexed to, uint256 value)",
+            "event Approval(address indexed owner, address indexed spender, uint256 value)"
+        ];
+
+        // ============ GLOBAL VARIABLES ============
+        let provider, signer, tokenGuard, mockToken, userAddress;
+        let isOwner = false;
+        let eventListenersSet = false;
+
+        // ============ WALLET CONNECTION ============
+        async function connectWallet() {
+            if (!window.ethereum) {
+                showAlert('reportAlert', 'Please install MetaMask!', 'error');
+                return;
+            }
+
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                const network = await provider.getNetwork();
+                if (network.chainId !== SEPOLIA_CHAIN_ID) {
+                    document.getElementById('networkWarning').classList.add('show');
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0xaa36a7' }]
+                        });
+                        window.location.reload();
+                    } catch (e) {
+                        console.log('Please switch manually');
+                    }
+                    return;
+                }
+
+                // Initialize Contracts
+                tokenGuard = new ethers.Contract(TOKENGUARD_ADDRESS, TOKENGUARD_ABI, signer);
+                mockToken = new ethers.Contract(MOCK_TOKEN_ADDRESS, MOCK_TOKEN_ABI, signer);
+
+                // Update UI
+                updateWalletInfo();
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('connectBtn').textContent = '✓ Connected';
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('networkWarning').classList.remove('show');
+
+                // Set up event listeners
+                if (!eventListenersSet) {
+                    setupEventListeners();
+                    eventListenersSet = true;
+                }
+
+                // Load all data
+                refreshAllData();
+
+            } catch (error) {
+                showAlert('reportAlert', 'Connection failed: ' + error.message, 'error');
+            }
+        }
+
+        // ============ UI UPDATE FUNCTIONS ============
+        async function updateWalletInfo() {
+            try {
+                const [ethBalance, mockBalance, mockTotalSupply, rewardPercent, contractOwner] = await Promise.all([
+                    provider.getBalance(userAddress),
+                    mockToken.balanceOf(userAddress),
+                    mockToken.totalSupply(),
+                    tokenGuard.rewardPercent(),
+                    tokenGuard.owner()
+                ]);
+
+                // Format values
+                const ethBal = ethers.utils.formatEther(ethBalance).substring(0, 8);
+                const mockBal = ethers.utils.formatEther(mockBalance);
+                const totalSupply = ethers.utils.formatEther(mockTotalSupply);
+
+                // Update wallet bar
+                document.getElementById('walletAddress').textContent = 
+                    userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                
+                const balancesHTML = `
+                    <div class="balance-item">
+                        <div class="balance-label">ETH</div>
+                        <div class="balance-value">${ethBal} ETH</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-label">MOCK</div>
+                        <div class="balance-value">${parseFloat(mockBal).toFixed(2)} MOCK</div>
+                    </div>
+                `;
+                document.getElementById('walletBalances').innerHTML = balancesHTML;
+
+                // Update dashboard
+                document.getElementById('dashboardMockBalance').textContent = parseFloat(mockBal).toFixed(2) + ' MOCK';
+                document.getElementById('dashboardEthBalance').textContent = ethBal + ' ETH';
+                document.getElementById('dashboardTotalSupply').textContent = parseFloat(totalSupply).toFixed(2) + ' MOCK';
+                document.getElementById('dashboardTokenGuardAddr').textContent = shortAddr(TOKENGUARD_ADDRESS);
+                document.getElementById('dashboardMockAddr').textContent = shortAddr(MOCK_TOKEN_ADDRESS);
+                document.getElementById('dashboardRewardPercent').textContent = rewardPercent + '%';
+                document.getElementById('dashboardOwner').textContent = shortAddr(contractOwner);
+
+                // Check if user is owner
+                isOwner = contractOwner.toLowerCase() === userAddress.toLowerCase();
+                if (isOwner) {
+                    document.getElementById('adminControls').style.display = 'block';
+                    document.getElementById('notOwnerMessage').style.display = 'none';
+                } else {
+                    document.getElementById('adminControls').style.display = 'none';
+                    document.getElementById('notOwnerMessage').style.display = 'block';
+                }
+
+                // Update token tab
+                document.getElementById('tokenTotalSupply').textContent = parseFloat(totalSupply).toFixed(2) + ' MOCK';
+                document.getElementById('tokenYourBalance').textContent = parseFloat(mockBal).toFixed(2) + ' MOCK';
+
+                // Update admin panel
+                document.getElementById('contractOwner').textContent = shortAddr(contractOwner);
+                document.getElementById('currentRewardPercent').textContent = rewardPercent + '%';
+                document.getElementById('contractAddress').textContent = shortAddr(TOKENGUARD_ADDRESS);
+                document.getElementById('rewardValue').textContent = rewardPercent + '%';
+                document.getElementById('rewardSlider').value = rewardPercent.toString();
+                document.getElementById('newRewardPercent').value = rewardPercent.toString();
+
+                // Update return tab
+                document.getElementById('currentRewardDisplay').textContent = rewardPercent + '%';
+
+            } catch (error) {
+                console.error('Error updating wallet info:', error);
+            }
+        }
+
+        async function updateAllowanceInfo() {
+            try {
+                const allowance = await mockToken.allowance(userAddress, TOKENGUARD_ADDRESS);
+                const allowanceFormatted = ethers.utils.formatEther(allowance);
+                
+                document.getElementById('dashboardAllowance').textContent = parseFloat(allowanceFormatted).toFixed(2) + ' MOCK';
+                
+                return allowance;
+            } catch (error) {
+                console.error('Error updating allowance:', error);
+                return ethers.constants.Zero;
+            }
+        }
+
+        async function refreshAllBalances() {
+            await updateWalletInfo();
+            await updateAllowanceInfo();
+            await refreshAllowances();
+            showAlert('reportAlert', 'All balances refreshed!', 'success');
+        }
+
+        async function refreshAllData() {
+            await updateWalletInfo();
+            await updateAllowanceInfo();
+            await loadAdminPanel();
+        }
+
+        // ============ TAB MANAGEMENT ============
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tab + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+
+            // Load specific data for tab
+            if (tab === 'dashboard') {
+                refreshAllData();
+            } else if (tab === 'admin') {
+                loadAdminPanel();
+            } else if (tab === 'token') {
+                refreshAllowances();
+            }
+        }
+
+        // ============ HELPER FUNCTIONS ============
+        function generateHash() {
+            const hash = '0x' + Array.from(crypto.getRandomValues(new Uint8Array(32)))
+                .map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            // Update all hash fields
+            ['reportTxHash', 'returnTxHash', 'checkTxHash', 'disputeTxHash'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = hash;
+            });
+            
+            showAlert('reportAlert', 'Random hash generated and applied to all fields!', 'success');
+        }
+
+        function useMockToken() {
+            document.getElementById('reportToken').value = MOCK_TOKEN_ADDRESS;
+            showAlert('reportAlert', 'Mock token address applied!', 'success');
+        }
+
+        function copyMyAddress() {
+            if (!userAddress) {
+                showAlert('reportAlert', 'Connect wallet first', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(userAddress);
+            showAlert('reportAlert', 'Address copied to clipboard!', 'success');
+        }
+
+        function shortAddr(addr) {
+            if (!addr || addr === ethers.constants.AddressZero) return 'None';
+            return addr.substring(0, 6) + '...' + addr.substring(38);
+        }
+
+        function showAlert(id, message, type) {
+            const el = document.getElementById(id);
+            el.textContent = message;
+            el.className = 'alert show alert-' + type;
+            
+            // Auto-hide success/info alerts after 5 seconds
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    el.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // ============ TOKENGUARD FUNCTIONS ============
+        async function reportLost() {
+            if (!signer) {
+                showAlert('reportAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const txHash = document.getElementById('reportTxHash').value.trim();
+            const token = document.getElementById('reportToken').value.trim();
+            const amount = document.getElementById('reportAmount').value;
+
+            if (!txHash || !token || !amount || amount <= 0) {
+                showAlert('reportAlert', 'Please fill all fields with valid values', 'error');
+                return;
+            }
+
+            try {
+                const amountWei = ethers.utils.parseEther(amount);
+                showAlert('reportAlert', 'Submitting report... Please confirm in MetaMask', 'info');
+
+                const tx = await tokenGuard.reportLost(txHash, token, amountWei);
+                showAlert('reportAlert', 'Transaction submitted! Waiting for confirmation...', 'info');
+
+                await tx.wait();
+                showAlert('reportAlert', '✅ Report submitted successfully! Others can now return your tokens', 'success');
+
+                // Clear form
+                document.getElementById('reportTxHash').value = '';
+                document.getElementById('reportAmount').value = '';
+
+            } catch (error) {
+                showAlert('reportAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function checkAllowance() {
+            if (!signer) {
+                showAlert('returnAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            try {
+                const allowance = await mockToken.allowance(userAddress, TOKENGUARD_ADDRESS);
+                const allowanceFormatted = ethers.utils.formatEther(allowance);
+                
+                document.getElementById('currentAllowance').textContent = 
+                    parseFloat(allowanceFormatted).toFixed(2) + ' MOCK';
+                document.getElementById('allowanceStatus').style.display = 'block';
+                
+                showAlert('returnAlert', `Current allowance: ${parseFloat(allowanceFormatted).toFixed(2)} MOCK`, 'info');
+                
+                return allowance;
+            } catch (error) {
+                showAlert('returnAlert', 'Error checking allowance: ' + error.message, 'error');
+                return ethers.constants.Zero;
+            }
+        }
+
+        async function approveMax() {
+            document.getElementById('returnAmount').value = '1000000'; // Max for testing
+            showAlert('returnAlert', 'Max amount set to 1,000,000 MOCK', 'info');
+        }
+
+        async function approveTokens() {
+            if (!signer) {
+                showAlert('returnAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const amount = document.getElementById('returnAmount').value;
+            if (!amount || amount <= 0) {
+                showAlert('returnAlert', 'Enter valid amount', 'error');
+                return;
+            }
+
+            try {
+                const amountWei = ethers.utils.parseEther(amount);
+                showAlert('returnAlert', 'Approving tokens... Please confirm in MetaMask', 'info');
+
+                const tx = await mockToken.approve(TOKENGUARD_ADDRESS, amountWei);
+                await tx.wait();
+
+                showAlert('returnAlert', '✅ Approval successful! Now click "Return Tokens & Earn Reward"', 'success');
+                
+                // Update allowance display
+                await checkAllowance();
+
+            } catch (error) {
+                showAlert('returnAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function returnTokens() {
+            if (!signer) {
+                showAlert('returnAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const txHash = document.getElementById('returnTxHash').value.trim();
+            if (!txHash) {
+                showAlert('returnAlert', 'Enter transaction hash', 'error');
+                return;
+            }
+
+            try {
+                showAlert('returnAlert', 'Returning tokens... Please confirm in MetaMask', 'info');
+
+                const tx = await tokenGuard.returnTokens(txHash);
+                await tx.wait();
+
+                showAlert('returnAlert', '✅ Success! Tokens returned and you earned your reward!', 'success');
+
+                // Clear form
+                document.getElementById('returnTxHash').value = '';
+                document.getElementById('returnAmount').value = '';
+
+                // Refresh balances
+                await updateWalletInfo();
+
+            } catch (error) {
+                showAlert('returnAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function checkStatus() {
+            if (!signer) {
+                showAlert('checkAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const txHash = document.getElementById('checkTxHash').value.trim();
+            if (!txHash) {
+                showAlert('checkAlert', 'Enter transaction hash', 'error');
+                return;
+            }
+
+            try {
+                // Get status from contract
+                const status = await tokenGuard.checkStatus(txHash);
+                
+                // Get full lost token data (including reportTime)
+                const lostToken = await tokenGuard.lostTokens(txHash);
+
+                // Update display
+                document.getElementById('statReporter').textContent = shortAddr(status.reporter);
+                document.getElementById('statToken').textContent = shortAddr(status.token);
+                document.getElementById('statAmount').textContent = 
+                    ethers.utils.formatEther(status.amount) + ' MOCK';
+                document.getElementById('statReward').textContent = 
+                    ethers.utils.formatEther(status.reward) + ' MOCK';
+                document.getElementById('statReturner').textContent = 
+                    status.returnedBy === ethers.constants.AddressZero ? 
+                    'Not yet' : shortAddr(status.returnedBy);
+                document.getElementById('statDisputed').textContent = 
+                    status.disputed ? 'Yes' : 'No';
+                
+                // Convert reportTime to readable format
+                const reportTime = new Date(lostToken.reportTime * 1000);
+                document.getElementById('statReportTime').textContent = 
+                    reportTime.toLocaleString();
+
+                // Status badge
+                let statusBadge = '';
+                if (status.resolved) {
+                    if (status.disputed) {
+                        statusBadge = '<span class="badge badge-disputed">⚠️ Disputed</span>';
+                    } else {
+                        statusBadge = '<span class="badge badge-success">✓ Returned</span>';
+                    }
+                } else {
+                    statusBadge = '<span class="badge badge-pending">⏳ Waiting</span>';
+                }
+                document.getElementById('statStatus').innerHTML = statusBadge;
+
+                document.getElementById('statusBox').classList.add('show');
+                showAlert('checkAlert', 'Status loaded successfully!', 'success');
+
+            } catch (error) {
+                document.getElementById('statusBox').classList.remove('show');
+                if (error.message.includes("Token not reported")) {
+                    showAlert('checkAlert', 'This transaction has not been reported', 'warning');
+                } else {
+                    showAlert('checkAlert', 'Error: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function fileDispute() {
+            if (!signer) {
+                showAlert('disputeAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const txHash = document.getElementById('disputeTxHash').value.trim();
+            const reason = document.getElementById('disputeReason').value.trim();
+
+            if (!txHash || !reason) {
+                showAlert('disputeAlert', 'Fill all fields', 'error');
+                return;
+            }
+
+            try {
+                showAlert('disputeAlert', 'Filing dispute... Please confirm in MetaMask', 'info');
+
+                const tx = await tokenGuard.fileDispute(txHash, reason);
+                await tx.wait();
+
+                showAlert('disputeAlert', '✅ Dispute filed successfully!', 'success');
+
+                // Clear form
+                document.getElementById('disputeTxHash').value = '';
+                document.getElementById('disputeReason').value = '';
+
+            } catch (error) {
+                showAlert('disputeAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============ MOCK TOKEN FUNCTIONS ============
+        async function transferMockTokens() {
+            if (!signer) {
+                showAlert('transferAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const to = document.getElementById('transferTo').value.trim();
+            const amount = document.getElementById('transferAmount').value;
+
+            if (!ethers.utils.isAddress(to)) {
+                showAlert('transferAlert', 'Invalid recipient address', 'error');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                showAlert('transferAlert', 'Enter valid amount', 'error');
+                return;
+            }
+
+            try {
+                const amountWei = ethers.utils.parseEther(amount);
+                showAlert('transferAlert', 'Transferring tokens... Please confirm in MetaMask', 'info');
+
+                const tx = await mockToken.transfer(to, amountWei);
+                await tx.wait();
+
+                showAlert('transferAlert', `✅ Success! Transferred ${amount} MOCK to ${shortAddr(to)}`, 'success');
+                
+                // Refresh balances
+                await updateWalletInfo();
+
+            } catch (error) {
+                showAlert('transferAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function transferMockTokensQuick() {
+            const to = document.getElementById('quickTransferTo').value.trim();
+            const amount = document.getElementById('quickTransferAmount').value;
+            
+            if (to && amount) {
+                document.getElementById('transferTo').value = to;
+                document.getElementById('transferAmount').value = amount;
+                await transferMockTokens();
+            }
+        }
+
+        async function approveMockTokens() {
+            if (!signer) {
+                showAlert('approveAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const spender = document.getElementById('approveSpender').value.trim();
+            const amount = document.getElementById('approveAmount').value;
+
+            if (!ethers.utils.isAddress(spender)) {
+                showAlert('approveAlert', 'Invalid spender address', 'error');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                showAlert('approveAlert', 'Enter valid amount', 'error');
+                return;
+            }
+
+            try {
+                const amountWei = ethers.utils.parseEther(amount);
+                showAlert('approveAlert', 'Approving tokens... Please confirm in MetaMask', 'info');
+
+                const tx = await mockToken.approve(spender, amountWei);
+                await tx.wait();
+
+                showAlert('approveAlert', `✅ Success! Approved ${amount} MOCK for ${shortAddr(spender)}`, 'success');
+                
+                // Refresh allowances
+                await refreshAllowances();
+                await updateAllowanceInfo();
+
+            } catch (error) {
+                showAlert('approveAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function approveMockTokensQuick() {
+            const amount = document.getElementById('quickApproveAmount').value;
+            if (amount) {
+                document.getElementById('approveAmount').value = amount;
+                await approveMockTokens();
+            }
+        }
+
+        async function checkAllowanceForSpender() {
+            if (!signer) {
+                showAlert('approveAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const spender = document.getElementById('approveSpender').value.trim();
+            
+            if (!ethers.utils.isAddress(spender)) {
+                showAlert('approveAlert', 'Invalid spender address', 'error');
+                return;
+            }
+
+            try {
+                const allowance = await mockToken.allowance(userAddress, spender);
+                const allowanceFormatted = ethers.utils.formatEther(allowance);
+                
+                showAlert('approveAlert', `Current allowance for ${shortAddr(spender)}: ${parseFloat(allowanceFormatted).toFixed(2)} MOCK`, 'info');
+                
+            } catch (error) {
+                showAlert('approveAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function setApproveMax() {
+            document.getElementById('approveAmount').value = '1000000';
+            showAlert('approveAlert', 'Max amount set to 1,000,000 MOCK', 'info');
+        }
+
+        async function mintMockTokens(amount = null) {
+            if (!signer) {
+                showAlert('mintAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            let to = document.getElementById('mintTo').value.trim();
+            let mintAmount = amount || document.getElementById('mintAmount').value;
+
+            if (!to) {
+                to = userAddress; // Mint to self if no address specified
+                document.getElementById('mintTo').value = to;
+            }
+
+            if (!ethers.utils.isAddress(to)) {
+                showAlert('mintAlert', 'Invalid recipient address', 'error');
+                return;
+            }
+
+            if (!mintAmount || mintAmount <= 0) {
+                showAlert('mintAlert', 'Enter valid amount', 'error');
+                return;
+            }
+
+            try {
+                const amountWei = ethers.utils.parseEther(mintAmount.toString());
+                showAlert('mintAlert', 'Minting tokens... Please confirm in MetaMask', 'info');
+
+                const tx = await mockToken.mint(to, amountWei);
+                await tx.wait();
+
+                showAlert('mintAlert', `✅ Success! Minted ${mintAmount} MOCK to ${shortAddr(to)}`, 'success');
+                
+                // Refresh balances
+                await updateWalletInfo();
+
+            } catch (error) {
+                showAlert('mintAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        function setMintToSelf() {
+            if (!userAddress) {
+                showAlert('mintAlert', 'Connect wallet first', 'error');
+                return;
+            }
+            document.getElementById('mintTo').value = userAddress;
+            showAlert('mintAlert', 'Set to mint to your own address', 'info');
+        }
+
+        function mint1000() {
+            document.getElementById('mintAmount').value = '1000';
+            showAlert('mintAlert', 'Amount set to 1000 MOCK', 'info');
+        }
+
+        async function refreshAllowances() {
+            if (!signer) return;
+
+            try {
+                // Common spenders to check
+                const commonSpenders = [
+                    { address: TOKENGUARD_ADDRESS, name: 'TokenGuard' },
+                    // Add more if needed
+                ];
+
+                let allowancesHTML = '';
+                
+                for (const spender of commonSpenders) {
+                    const allowance = await mockToken.allowance(userAddress, spender.address);
+                    const allowanceFormatted = ethers.utils.formatEther(allowance);
+                    
+                    if (allowance.gt(0)) {
+                        allowancesHTML += `
+                            <div class="allowance-row">
+                                <div class="allowance-info">
+                                    <div class="allowance-label">${spender.name}</div>
+                                    <div class="allowance-value">${parseFloat(allowanceFormatted).toFixed(2)} MOCK</div>
+                                </div>
+                                <button class="quick-btn" onclick="setRevokeSpender('${spender.address}')">Revoke</button>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (!allowancesHTML) {
+                    allowancesHTML = '<div style="color: #94a3b8; text-align: center; padding: 20px;">No active allowances found</div>';
+                }
+
+                document.getElementById('allowancesList').innerHTML = allowancesHTML;
+
+            } catch (error) {
+                console.error('Error refreshing allowances:', error);
+            }
+        }
+
+        async function setRevokeSpender(spenderAddress) {
+            document.getElementById('approveSpender').value = spenderAddress;
+            document.getElementById('approveAmount').value = '0';
+            showAlert('approveAlert', 'Set to revoke allowance. Click "Approve Tokens" to confirm.', 'warning');
+        }
+
+        // ============ ADMIN FUNCTIONS ============
+        async function loadAdminPanel() {
+            if (!signer) return;
+
+            try {
+                // Check ownership
+                const contractOwner = await tokenGuard.owner();
+                const currentOwner = contractOwner.toLowerCase();
+                isOwner = currentOwner === userAddress.toLowerCase();
+
+                // Update UI based on ownership
+                if (isOwner) {
+                    document.getElementById('adminControls').style.display = 'block';
+                    document.getElementById('notOwnerMessage').style.display = 'none';
+                } else {
+                    document.getElementById('adminControls').style.display = 'none';
+                    document.getElementById('notOwnerMessage').style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('Error loading admin panel:', error);
+            }
+        }
+
+        function updateRewardValue(value) {
+            document.getElementById('rewardValue').textContent = value + "%";
+            document.getElementById('newRewardPercent').value = value;
+        }
+
+        async function updateRewardPercent() {
+            if (!signer) {
+                showAlert('adminAlert', 'Connect wallet first', 'error');
+                return;
+            }
+
+            const newPercent = document.getElementById('newRewardPercent').value;
+            if (!newPercent || newPercent < 1 || newPercent > 20) {
+                showAlert('adminAlert', 'Enter valid percentage (1-20)', 'error');
+                return;
+            }
+
+            // Check if user is owner
+            if (!isOwner) {
+                showAlert('adminAlert', 'Only contract owner can update reward percentage', 'error');
+                return;
+            }
+
+            try {
+                showAlert('adminAlert', 'Updating reward percentage... Please confirm in MetaMask', 'info');
+
+                const tx = await tokenGuard.setRewardPercent(newPercent);
+                await tx.wait();
+
+                showAlert('adminAlert', `✅ Success! Reward percentage updated to ${newPercent}%`, 'success');
+
+                // Update all displays
+                await refreshAllData();
+
+            } catch (error) {
+                showAlert('adminAlert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        // ============ EVENT LISTENERS ============
+        function setupEventListeners() {
+            try {
+                // TokenGuard Events
+                tokenGuard.on("TokenReported", (txHash, reporter, amount, reward, event) => {
+                    addEventLog(`📝 ${shortAddr(reporter)} reported ${ethers.utils.formatEther(amount)} MOCK lost`, 'info');
+                });
+                
+                tokenGuard.on("TokenReturned", (txHash, returnedBy, reward, event) => {
+                    addEventLog(`💰 ${shortAddr(returnedBy)} returned tokens and earned ${ethers.utils.formatEther(reward)} MOCK reward`, 'success');
+                });
+                
+                tokenGuard.on("DisputeFiled", (txHash, reporter, reason, event) => {
+                    addEventLog(`⚖️ ${shortAddr(reporter)} filed a dispute`, 'warning');
+                });
+
+                // MockToken Events (for the connected user)
+                mockToken.on(mockToken.filters.Transfer(null, userAddress), (from, to, value, event) => {
+                    if (to.toLowerCase() === userAddress.toLowerCase()) {
+                        addEventLog(`🎁 Received ${ethers.utils.formatEther(value)} MOCK from ${shortAddr(from)}`, 'info');
+                    }
+                });
+
+                mockToken.on(mockToken.filters.Transfer(userAddress, null), (from, to, value, event) => {
+                    if (from.toLowerCase() === userAddress.toLowerCase()) {
+                        addEventLog(`📤 Sent ${ethers.utils.formatEther(value)} MOCK to ${shortAddr(to)}`, 'info');
+                    }
+                });
+
+                mockToken.on(mockToken.filters.Approval(userAddress, null), (owner, spender, value, event) => {
+                    if (owner.toLowerCase() === userAddress.toLowerCase()) {
+                        addEventLog(`✅ Approved ${ethers.utils.formatEther(value)} MOCK for ${shortAddr(spender)}`, 'success');
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error setting up event listeners:", error);
+            }
+        }
+
+        function addEventLog(message, type = 'info') {
+            const eventLog = document.getElementById('eventLog');
+            const time = new Date().toLocaleTimeString();
+            
+            // Remove "Waiting for events" message if present
+            if (eventLog.children.length === 1 && eventLog.children[0].innerText.includes("Waiting for events")) {
+                eventLog.innerHTML = '';
+            }
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.cssText = 'padding: 8px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 0.85rem;';
+            
+            if (type === 'success') logEntry.style.borderLeft = '3px solid #10b981';
+            else if (type === 'warning') logEntry.style.borderLeft = '3px solid #f59e0b';
+            else if (type === 'error') logEntry.style.borderLeft = '3px solid #ef4444';
+            else logEntry.style.borderLeft = '3px solid #3b82f6';
+            
+            logEntry.innerHTML = `<span style="color: #94a3b8; font-size: 0.75rem;">[${time}]</span> ${message}`;
+            
+            eventLog.prepend(logEntry);
+            
+            // Limit to 20 entries
+            if (eventLog.children.length > 20) {
+                eventLog.removeChild(eventLog.lastChild);
+            }
+        }
+
+        // ============ AUTO-CONNECT ============
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    setTimeout(() => {
+                        connectWallet();
+                    }, 500);
+                }
+            }
+        });
+
+        // ============ METAMASK ACCOUNT CHANGE HANDLER ============
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    window.location.reload();
+                } else {
+                    // User disconnected
+                    window.location.reload();
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

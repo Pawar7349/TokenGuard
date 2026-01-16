@@ -1,0 +1,8 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "mockToken": "0x7cD9B8689C5D19CB4e4F45A23d14Beb4411aB87E",
+  "tokenGuard": "0x9FECAeCc66369b4cDb68cC687B983E87D0aab091",
+  "deployer": "0xc02f86A212D6baAAa03741B847Cd1C90AA6A0320",
+  "deployedAt": "2026-01-16T07:09:25.887Z"
+}
